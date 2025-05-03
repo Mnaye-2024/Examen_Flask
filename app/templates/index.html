@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Dernières Transactions</h2>
+    {% if transactions %}
+    <table class="transactions-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Type</th>
+                <th>Catégorie</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.date.strftime('%d/%m/%Y') }}</td>
+                <td class="{{ 'transaction-income' if transaction.type == 'income' else 'transaction-expense' }}">
+                    {{ transaction.amount | currency }}
+                </td>
+                <td>{{ 'Revenu' if transaction.type == 'income' else 'Dépense' }}</td>
+                <td>{{ transaction.category.name if transaction.category else 'N/A' }}</td>
+                <td>{{ transaction.description or '-' }}</td>
+                <td>
+                    <form action="{{ url_for('main.delete_transaction', transaction_id=transaction.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette transaction ?');">
+                        <button type="submit" class="btn btn-danger btn-sm">Suppr.</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucune transaction enregistrée pour le moment. <a href="{{ url_for('main.add_transaction') }}">Ajouter une transaction</a>.</p>
+    {% endif %}
+{% endblock %}
